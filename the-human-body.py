@@ -1,4 +1,4 @@
-# Shebang statement- tells system to execute in Python
+# Shebang statement tells system to execute in Python
 #!/usr/bin/env python
 
 # -*- coding: utf-8 -*-
@@ -118,9 +118,7 @@ def step_day(body, params, food_kcal, water_l, dt=1.0):
     for k in body.outputs:
         body.outputs[k] = 0.0
 
-    # -------------------------
     # Energy balance
-    # -------------------------
     daily_need = params.bmr_kcal * params.activity_factor * dt
     body.energy_kcal += food_kcal
 
@@ -137,18 +135,14 @@ def step_day(body, params, food_kcal, water_l, dt=1.0):
     # CO2 output
     body.outputs["co2_g"] = used * params.co2_g_per_kcal
 
-    # -------------------------
     # Water balance
-    # -------------------------
     water_out = (params.urine_l + params.sweat_l + params.insensible_l) * dt
     body.total_water_l += (water_l - water_out)
 
     body.outputs["urine_l"] = params.urine_l * dt
     body.outputs["sweat_l"] = params.sweat_l * dt
 
-    # -------------------------
     # Cell turnover
-    # -------------------------
     dead_human = 0.0
     dead_microbes = 0.0
 
@@ -204,10 +198,7 @@ def run_sim(days=30):
     return history
 
 
-# ------------------------------------------------------------
 # 6. Example Usage
-# ------------------------------------------------------------
-
 if __name__ == "__main__":
     data = run_sim(10)
     for day in data:

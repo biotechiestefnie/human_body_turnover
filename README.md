@@ -1,6 +1,6 @@
 
 
-This program is my attempt at a structured, extensible model in Python that depicts
+This program is a structured, extensible model in Python that depicts
 the following equation for the human body:
     state(t + dt) = state(t) + inputs - outputs + internal changes
 

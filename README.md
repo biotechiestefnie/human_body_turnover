@@ -1,50 +1,92 @@
 
 
-This program is a structured, extensible model in Python that depicts
-the following equation for the human body:
+This program is a structured, extensible model in Python that depicts the following equation for the human body:
+
     state(t + dt) = state(t) + inputs - outputs + internal changes
 
-1.1 It includes:
+It includes:
+
+1.1 Overall Components:
+
     * A BodyState class
+    
     * A CellCompartment class
+    
     * A ModelParameters class
+    
     * A daily simulation step
+    
     * A multi‑day simulation loop
-    * Logging of mass, water, CO₂, feces, and cell turnover
+    
+    * Logging of mass, water, CO2, stool, and cell turnover
+    
 
 And accounts for:
-2.1 Human compartments (for cells + mass):
-    * Skin 
-    * Gut epithelium
-    * Blood (RBCs, WBCs as a lump)
-    * “Stable” tissues (brain, etc.)
-2.2 Microbial compartments:
-    * Gut microbiome
-    * Skin microbiome
-    * Systemic/low‑abundance microbiome (blood/brain/etc. lumped)
-2.3 Global state variables:
-    * Total body mass
-    * Total body water
-    * Energy balance
-2.4 Daily I/O: 
-    * food 
-    * water 
-    * CO₂
-    * O2
-    * urine 
-    * excrement 
-    * sweat 
-    * dead cells shed
 
+2.1 Human compartments (for cells + mass):
+
+    * Skin 
+    
+    * Gut epithelium
+    
+    * Blood (RBCs, WBCs as a lump)
+    
+    * “Stable” tissues (brain, etc.)
+    
+2.2 Microbial compartments:
+
+    * Gut microbiome
+    
+    * Skin microbiome
+    
+    * Systemic/low‑abundance microbiome (blood/brain/etc. lumped)
+    
+2.3 Global state variables:
+
+    * Total body mass
+    
+    * Total body water
+    
+    * Energy balance
+    
+2.4 Daily I/O: 
+
+    * food 
+    
+    * water 
+    
+    * CO2
+    
+    * O2
+    
+    * urine 
+    
+    * excrement 
+    
+    * sweat 
+    
+    * dead cells shed
+    
 All will be simulated in daily timesteps to ensure manageability.
 
+
 Core Data Structures:
+
 3.1. Cell compartments:
+
 Each cell compartment (human or microbial) can be represented with:
+
     * Current cell count
+    
     * Daily turnover fraction (fraction of cells that die each day)
+    
     * Optional growth bias (for microbes)
+
+
+**Pseudocode**
+
 ```
+
 class CellCompartment:
     def __init__(self, name, initial_cells, daily_turnover_fraction, growth_bias=0.0, kind="human"):
         """
@@ -54,6 +96,8 @@ class CellCompartment:
         growth_bias: net growth per day (for microbes, e.g. 0.01 = +1%/day at steady intake)
         kind: "human" or "microbial"
         """
+
+        # initialize
         self.name = name
         self.cells = initial_cells
         self.turnover = daily_turnover_fraction
@@ -79,7 +123,9 @@ class CellCompartment:
 ```
 
 Instantiating things like:
+
 ```
+
 gut_epithelium = CellCompartment(
     name="gut_epithelium",
     initial_cells=1e11,
@@ -118,8 +164,10 @@ systemic_microbiome = CellCompartment(
 
 ```
 
-Whole body state and parameters: 
+Whole body state and parameters:
+
 ```
+
 class ModelParameters:
     def __init__(self):
         # Energy
@@ -140,8 +188,10 @@ class ModelParameters:
 
 ```
 
-Body State: 
+Body State:
+
 ```
+
 class BodyState:
     def __init__(self, initial_mass_kg=70.0):
         self.total_mass_kg = initial_mass_kg
@@ -179,14 +229,24 @@ class BodyState:
 
 ```
 
+
 Main Function:
+
 One step_day function that: 
-    * Applies inputs (food, water).
-    * Computes energy use and CO₂ production.
-    * Updates water balance.
-    * Steps each cell compartment and tallies dead cells.
-    * Updates waste (feces includes dead cells + baseline).
-    * Adjusts mass roughly where needed.
+
+    * Applies inputs (food, water)
+    
+    * Computes energy use and CO2 production
+    
+    * Updates water balance
+    
+    * Steps each cell compartment and tallies dead cells
+    
+    * Updates waste (feces includes dead cells + baseline)
+    
+    * Adjusts mass roughly where needed
+
+**Pseudocode**
 
 ```
 def step_day(body: BodyState, params: ModelParameters, food_kcal, water_l, dt_days=1.0):
@@ -291,16 +351,25 @@ def run_simulation(days=30):
 ```
 
 And can then visualize:
+
     * Total human vs microbial cells over time
+    
     * Daily dead cells (turnover) per compartment
-    * Daily CO₂, feces, water loss
+    
+    * Daily CO2, feces, water loss
+    
     * Weight changes with different diets or activity factors
 
 Once this skeleton is in place, we can iteratively:
+
     * Refine turnover rates and compartment sizes
-    * Include O₂ intake explicitly via respiratory equations
+    
+    * Include O2 intake explicitly via respiratory equations
+    
     * Add stochasticity (random variation around means)
+    
     * Add events (fasting, illness, intense exercise) and watch how cell turnover and I/O change
+    
     * Document assumptions like a mini‑paper
 
 Important Rates to Keep in Mind:
@@ -326,7 +395,9 @@ Gut microbiome	    |       0.20–0.60
 Skin microbiome	    |       0.10–0.30
 Systemic microbiome |	    0.20–0.30 (modeling assumption)
 
+
 For each kcal of energy used, the body consumes about 
-0.2 liters of O₂ and produces about 0.2 liters of CO₂ (this is tied to respiratory 
-quotient and substrate mix.
+
+0.2 liters of O2 and produces about 0.2 liters of CO2 (this is tied to respiratory quotient and substrate mix
+
 energy(exp) <-> O2(consumed) <-> CO2(expelled)

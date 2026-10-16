@@ -1,7 +1,6 @@
 # Shebang statement tells system to execute in Python
 #!/usr/bin/env python
 
-# -*- coding: utf-8 -*-
 
 """
 File: the-human-body.py
